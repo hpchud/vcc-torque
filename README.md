@@ -52,14 +52,28 @@ docker run -d --net=host hpchud/vcc-torque \
     --service=workernode
 ```
 
-And that's it! You can now enter the head node container by executing the following command on the host running it 
+And that's it! You can now enter the head node container using SSH.
 
 ```
-docker exec -it ID /bin/bash
+ssh -i batchuser.id_rsa batchuser@headnode.ip -p 2222
 ```
-where CID is the ID of the head node container assigned by Docker.
 
-Read on to find out how this image is configured, how to access it using SSH, how to use your own user accounts, etc.
+Try running `pbsnodes` to see the cluster, and SSH from the head node to the worker node using it's name!
+
+```
+[batchuser@dbd37de43e80 /]# pbsnodes
+vnode_a4aa99e7aeb6
+     state = free
+     power_state = Running
+     np = 8
+     ntype = cluster
+     ...
+[batchuser@dbd37de43e80 /]$ ssh vnode_a4aa99e7aeb6
+Warning: Permanently added '[vnode_a4aa99e7aeb6]:2222,[10.10.10.3]:2222' (ECDSA) to the list of known hosts.
+[batchuser@a4aa99e7aeb6 ~]$
+```
+
+To add more worker nodes, simply repeat the second `docker run`. To start up the cluster on a single machine, just omit the `--net=host` option.
 
 ## Configuration
 

@@ -51,7 +51,11 @@ docker exec -it ID /bin/bash
 ```
 where CID is the ID of the head node container assigned by Docker.
 
+Read on to find out how this image is configured, how to access it using SSH, how to use your own user accounts, etc.
+
 ## Configuration
+
+### Services
 
 This image is a *multi-role* image - the same Docker image provides both `headnode` and `workernode` roles in the context of a Torque cluster. If not specified, it will default to `workernode` role.
 
@@ -90,10 +94,34 @@ Finally, and most importantly, the PBS server states that it requires the `trqau
 
 If a service block does not define any `requires` it will be triggered to start as soon as the service manager runs.
 
-### headnode role
+### Hooks
 
 The `pbsnodes.sh` *cluster hook* is executed everytime a host (or running container) is added or removed from this VCC instance. This facilitates regeneration of the Torque server's node file, and then instructs it to reload the daemon.
 
-### workernode role
-
 The `headnode.sh` *service hook* is run when the provider of a service within the VCC changes, in this case, the `headnode` *cluster service*. This facilitates configuration of the Torque MOM execution node client.
+
+### User Accounts
+
+A user is created in the Dockerfile called `batchuser`.
+
+### Passwordless SSH
+
+For the `batchuser` account, an SSH key is added to the image and to the `authorized_keys` file. The SSH service is configured to run on port `2222` to avoid overlapping with any SSH instance on the host system.
+
+### Shared filesystem
+
+No shared filesystem is configured between the containers using this image, as the container must be run in privileged mode in order to perform a mount. 
+
+A shared filesystem may not be required at all if you customise the container image to include all the files you need.
+
+Alternatively, if your underlying hosts are set up with a shared filesystem mounted, you can pass this through to the container as a volume.
+
+## Customising the cluster
+
+In order to customise the cluster image, such as changing the SSH port, adding/removing users and packages, there are two options: clone this repository and make the changes, or create a new Dockerfile that extends this image.
+
+Which option you choose depends on what you would like to do. If you want to contribute a change, please fork the repository and create a pull request!
+
+If you want to add additional packages, the best way might be to create a new Dockerfile that is based from this image.
+
+However, if for example you want to remove the `batchuser` account, your only choice would be to make a copy of this repository and change it.

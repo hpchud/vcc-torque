@@ -60,3 +60,24 @@ RUN chmod +x /etc/vcc/cluster-hooks.d/*
 # service hook scripts
 ADD hooks/headnode.sh /etc/vcc/service-hooks.d/headnode.sh
 RUN chmod +x /etc/vcc/service-hooks.d/*
+
+# set up SSH config
+ADD sshd_config /etc/ssh/sshd_config
+RUN echo "Port 2222 >> /etc/ssh/ssh_config"
+RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+RUN echo "UserKnownHostsFile /dev/null" >> /etc/ssh/ssh_config
+
+# add the batchuser user
+RUN useradd --create-home --uid 900 --shell /bin/bash batchuser
+RUN echo batchuser:batchuser | chpasswd
+
+# add the SSH key for batchuser
+
+RUN mkdir -p /home/batchuser/.ssh
+ADD batchuser.id_rsa /home/batchuser/.ssh/id_rsa
+ADD batchuser.id_rsa.pub /home/batchuser/.ssh/id_rsa.pub
+RUN cat /home/batchuser/.ssh/id_rsa.pub > /home/batchuser/.ssh/authorized_keys
+RUN cat /home/batchuser/.ssh/id_rsa.pub > /home/batchuser/.ssh/authorized_keys2
+RUN chmod 700 /home/batchuser/.ssh
+RUN chmod 600 /home/batchuser/.ssh/*
+RUN chown -R batchuser:batchuser /home/batchuser/.ssh

@@ -7,7 +7,7 @@ This is a VCC built to run a Torque batch scheduling cluster.
 As with the `vcc-base` image, Dockerfiles are provided to build the image against CentOS or Ubuntu.
 
 ```
-docker build -f Dockerfile.centos -t hpchud/vcc-torque
+docker build -f Dockerfile.centos -t hpchud/vcc-torque .
 ```
 
 ## Running it

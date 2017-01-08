@@ -108,6 +108,12 @@ A user is created in the Dockerfile called `batchuser`.
 
 For the `batchuser` account, an SSH key is added to the image and to the `authorized_keys` file. The SSH service is configured to run on port `2222` to avoid overlapping with any SSH instance on the host system.
 
+SSH into it using the private key in this repository, but be sure to generate new keys if you use this image in real life!
+
+```
+ssh -i batchuser.id_rsa batchuser@headnode.ip -p 2222
+```
+
 ### Shared filesystem
 
 No shared filesystem is configured between the containers using this image, as the container must be run in privileged mode in order to perform a mount. 

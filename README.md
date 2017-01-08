@@ -73,7 +73,7 @@ Warning: Permanently added '[vnode_a4aa99e7aeb6]:2222,[10.10.10.3]:2222' (ECDSA)
 [batchuser@a4aa99e7aeb6 ~]$
 ```
 
-To add more worker nodes, simply repeat the second `docker run`. To start up the cluster on a single machine, just omit the `--net=host` option.
+To add more worker nodes, simply repeat the second `docker run`. To start up the cluster on a single machine, just omit the `--net=host` option (in this case you can use `docker exec` to log in to the headnode).
 
 ## Configuration
 

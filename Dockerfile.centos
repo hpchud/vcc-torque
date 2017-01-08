@@ -1,0 +1,42 @@
+FROM hpchud/vcccentos:7
+
+ARG http_proxy=http://wwwproxy.hud.ac.uk:3128
+ARG https_proxy=http://wwwproxy.hud.ac.uk:3128
+
+# install packages required
+RUN yum -y install make libtool openssl-devel libxml2-devel boost-devel gcc gcc-c++ git nano openssh-server openssh-clients
+
+# build and install torque 5 in one step
+WORKDIR /
+RUN git clone https://github.com/adaptivecomputing/torque.git -b 5.1.1.2 torque-src \
+	&& cd torque-src \
+	&& ./autogen.sh \
+	&& ./configure --prefix=/usr --disable-posixmemlock --disable-cpuset \
+	&& make \
+	&& make install \
+	&& ldconfig \
+	&& cd .. \
+	&& cp torque-src/torque.setup . \
+	&& rm -r torque-src
+
+# torque config
+# we don't have interaction so need to fix setup script
+RUN sed -i 's/-t create/-t create -f/' torque.setup \
+	&& ./torque.setup root localhost \
+	&& qmgr -c "set server auto_node_np=true" \
+	&& rm torque.setup
+
+# install vcc configuration files
+COPY init.yml /etc/init.yml
+COPY services.yml /etc/services.yml
+COPY services-headnode.yml /etc/vcc/services-headnode.yml
+COPY services-workernode.yml /etc/vcc/services-workernode.yml
+COPY dependencies.yml /etc/vcc/dependencies.yml
+
+# cluster hook scripts
+ADD hooks/pbsnodes.sh /etc/vcc/cluster-hooks.d/pbsnodes.sh
+RUN chmod +x /etc/vcc/cluster-hooks.d/*
+
+# service hook scripts
+ADD hooks/headnode.sh /etc/vcc/service-hooks.d/headnode.sh
+RUN chmod +x /etc/vcc/service-hooks.d/*

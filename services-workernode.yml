@@ -1,0 +1,17 @@
+---
+
+trqauthd:
+    type: daemon
+    exec: /usr/sbin/trqauthd -D
+    requires: clusterstart
+
+pbs_mom:
+    type: daemon
+    exec: /usr/sbin/pbs_mom -D
+    restart_limit: -1
+    requires: trqauthd, clusterwatcher
+
+clustertargets:
+    type: shell
+    exec: "/bin/true"
+    requires: sshd, trqauthd

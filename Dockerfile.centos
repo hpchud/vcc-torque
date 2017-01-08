@@ -43,6 +43,7 @@ RUN chmod +x /etc/vcc/service-hooks.d/*
 
 # set up SSH config
 ADD sshd_config /etc/ssh/sshd_config
+RUN echo "Port 2222 >> /etc/ssh/ssh_config"
 RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 RUN echo "UserKnownHostsFile /dev/null" >> /etc/ssh/ssh_config
 

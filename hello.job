@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# set the number of nodes and processes per node
+#PBS -l nodes=2:ppn=2
+
+# set name of job
+#PBS -N Hello
+
+# use submission environment
+#PBS -q batch
+
+# start job from the directory it was submitted
+cd $PBS_O_WORKDIR
+
+# some example code
+cat <<EOF > hello.c
+#include <mpi.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char **argv)
+{
+  int rank;
+  char hostname[256];
+
+  MPI_Init(&argc,&argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  gethostname(hostname,255);
+
+  printf("%s / %d [OK]\n", hostname, rank);
+
+  MPI_Finalize();
+
+  return 0;
+}
+EOF
+
+# set up the path
+export PATH=${PATH}:/usr/local/bin
+
+# compile the code
+mpicc -o hello hello.c
+
+# copy the exe to each node (remember, no shared filesystem..)
+while read -r node
+do
+	scp ./hello ${node}:`pwd`/hello
+done < "$PBS_NODEFILE"
+
+# work out total number of processors
+nprocs=`wc -l $PBS_NODEFILE | awk '{ print $1 }'`
+
+# run through the mpirun launcher
+mpirun -np $nprocs -machinefile $PBS_NODEFILE ./hello

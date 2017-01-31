@@ -19,3 +19,5 @@ qterm -t quick
 # have to kill maui too, but give time for pbs_server to restart
 sleep 5
 kill `cat /var/run/maui.pid`
+
+# using auto_node_np confuses maui, so reiterate np's

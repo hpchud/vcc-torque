@@ -1,7 +1,7 @@
 FROM hpchud/vcc-base-centos:7
 
 # install packages required
-RUN yum -y install make libtool openssl-devel libxml2-devel boost-devel gcc gcc-c++ git nano openssh-server openssh-clients
+RUN yum -y install make libtool openssl-devel libxml2-devel boost-devel gcc gcc-c++ git nano openssh-server openssh-clients gcc-gfortran
 
 # build and install torque 5 in one step
 WORKDIR /
@@ -46,6 +46,17 @@ RUN cd /tmp \
 	&& rm -rf /tmp/maui-build
 COPY maui-config.sh /etc/vcc/maui-config.sh
 
+# build and install mpich
+RUN cd /tmp \
+	&& curl -O http://www.mpich.org/static/downloads/3.2/mpich-3.2.tar.gz \
+	&& tar xf mpich-*.tar.gz \
+	&& cd mpich-* \
+	&& ./configure \
+	&& make \
+	&& make install \
+	&& cd / \
+	&& rm -rf /tmp/mpich-*
+
 # make links for maui tools
 RUN ln -s /usr/local/maui/bin/showq /usr/bin/showq
 RUN ln -s /usr/local/maui/bin/showbf /usr/bin/showbf
@@ -85,6 +96,13 @@ ADD batchuser.id_rsa /home/batchuser/.ssh/id_rsa
 ADD batchuser.id_rsa.pub /home/batchuser/.ssh/id_rsa.pub
 RUN cat /home/batchuser/.ssh/id_rsa.pub > /home/batchuser/.ssh/authorized_keys
 RUN cat /home/batchuser/.ssh/id_rsa.pub > /home/batchuser/.ssh/authorized_keys2
+
+# add example MPI job
+
+ADD hello.job /home/batchuser/hello.job
+
+# fix permissions for batchuser
+
 RUN chmod 700 /home/batchuser/.ssh
 RUN chmod 600 /home/batchuser/.ssh/*
 RUN chown -R batchuser:batchuser /home/batchuser/.ssh

@@ -2,7 +2,7 @@
 
 This is a VCC built to run a Torque batch scheduling cluster.
 
-It also includes the MAUI scheduler and pdsh as a bonus.
+It also includes C and Fortran compilers, MPICH 3.2, the MAUI scheduler and pdsh as a bonus.
 
 The default SSH port is changed to 2222 to avoid conflicting with any other SSH instance.
 

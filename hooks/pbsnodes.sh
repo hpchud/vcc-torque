@@ -15,3 +15,7 @@ done
 
 # kill the torque server without stopping jobs
 qterm -t quick
+
+# have to kill maui too, but give time for pbs_server to restart
+sleep 5
+kill `cat /var/run/maui.pid`

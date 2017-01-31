@@ -2,12 +2,16 @@
 
 This is a VCC built to run a Torque batch scheduling cluster.
 
+It also includes the MAUI scheduler and pdsh as a bonus.
+
+The default SSH port is changed to 2222 to avoid conflicting with any other SSH instance.
+
 ## Building it
 
-As with the `vcc-base` image, Dockerfiles are provided to build the image against CentOS or Ubuntu.
+This image is based from the `vcc-base-centos`, therefore, will be built with a CentOS based. It should not be too difficult to port to another distribution base, since the Dockerfile will build all components from source.
 
 ```
-docker build -f Dockerfile.centos -t hpchud/vcc-torque .
+docker build -t hpchud/vcc-torque .
 ```
 
 ## Running it

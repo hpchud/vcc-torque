@@ -15,6 +15,17 @@ pbs_server:
     restart_limit: -1
     requires: trqauthd
 
+mauicfg:
+    type: shell
+    exec: "/etc/vcc/maui-config.sh"
+    requires: pbs_server
+
+maui:
+    type: daemon
+    exec: /usr/local/maui/sbin/maui -d
+    restart_limit: -1
+    requires: mauicfg
+
 clustertargets:
     type: shell
     exec: "/bin/true"

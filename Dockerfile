@@ -1,7 +1,4 @@
-FROM hpchud/vcccentos:7
-
-ARG http_proxy=http://wwwproxy.hud.ac.uk:3128
-ARG https_proxy=http://wwwproxy.hud.ac.uk:3128
+FROM hpchud/vcc-base-centos:7
 
 # install packages required
 RUN yum -y install make libtool openssl-devel libxml2-devel boost-devel gcc gcc-c++ git nano openssh-server openssh-clients
@@ -26,6 +23,35 @@ RUN sed -i 's/-t create/-t create -f/' torque.setup \
 	&& qmgr -c "set server auto_node_np=true" \
 	&& rm torque.setup
 
+# build and install pdsh
+RUN cd /tmp \
+	&& git clone https://github.com/grondo/pdsh.git pdsh-build \
+	&& cd pdsh-build \
+	&& git checkout -q e1c8e71dd6a26b40cd067a8322bd14e10e4f7ded \
+	&& ./configure --with-ssh --without-rsh --prefix=/usr --with-machines=/etc/vcc/pdsh_machines \
+	&& make \
+	&& make install \
+	&& cd / \
+	&& rm -rf /tmp/pdsh-build
+
+# build and install MAUI
+RUN cd /tmp \
+	&& git clone https://github.com/jbarber/maui.git maui-build \
+	&& cd maui-build \
+	&& git checkout -q 7a8513a1317afd57afab6f800d0c15f124d6083f \
+	&& ./configure --with-pbs \
+	&& make \
+	&& make install \
+	&& cd / \
+	&& rm -rf /tmp/maui-build
+COPY maui-config.sh /etc/vcc/maui-config.sh
+
+# make links for maui tools
+RUN ln -s /usr/local/maui/bin/showq /usr/bin/showq
+RUN ln -s /usr/local/maui/bin/showbf /usr/bin/showbf
+RUN ln -s /usr/local/maui/bin/showres /usr/bin/showres
+RUN ln -s /usr/local/maui/bin/checkjob /usr/bin/checkjob
+
 # install vcc configuration files
 COPY init.yml /etc/init.yml
 COPY services.yml /etc/services.yml
@@ -35,6 +61,7 @@ COPY dependencies.yml /etc/vcc/dependencies.yml
 
 # cluster hook scripts
 ADD hooks/pbsnodes.sh /etc/vcc/cluster-hooks.d/pbsnodes.sh
+ADD hooks/pdsh.sh /etc/vcc/cluster-hooks.d/pdsh.sh
 RUN chmod +x /etc/vcc/cluster-hooks.d/*
 
 # service hook scripts

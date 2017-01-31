@@ -20,4 +20,11 @@ qterm -t quick
 sleep 5
 kill `cat /var/run/maui.pid`
 
-# using auto_node_np confuses maui, so reiterate np's
+# using auto_node_np confuses maui, so save auto detected nps
+# wait another few seconds incase auto detection is taking awhile
+sleep 3
+cat /var/spool/torque/server_priv/nodes | while read line; do
+	node="`echo $line | awk '{print $1}'`"
+	np="`pbsnodes $node | grep np | awk '{print $3}'`"
+	qmgr -c "set node $node np=$np"
+done

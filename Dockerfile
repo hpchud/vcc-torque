@@ -1,4 +1,4 @@
-FROM hpchud/vcc-base-centos
+FROM hpchud/vcc-base-centos:7
 
 # install packages required
 RUN yum -y install make libtool openssl-devel libxml2-devel boost-devel gcc gcc-c++ git nano openssh-server openssh-clients gcc-gfortran

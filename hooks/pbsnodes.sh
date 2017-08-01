@@ -4,7 +4,9 @@
 
 echo -n > /var/spool/torque/server_priv/nodes
 
-cat /etc/hosts.vcc | while read line; do
+INIT_RUN_DIR="${INIT_RUN_DIR:-/run}"
+
+cat $INIT_RUN_DIR/hosts.vcc | while read line; do
 	host="`echo $line | awk '{print $2}'`"
 	if [ "$host" != "`hostname`" ]; then
 		# torque can not handle a hostname that starts with a number,

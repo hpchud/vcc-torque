@@ -48,7 +48,7 @@ COPY maui-config.sh /etc/vcc/maui-config.sh
 
 # build and install mpich
 RUN cd /tmp \
-	&& curl -O http://www.mpich.org/static/downloads/3.2/mpich-3.2.tar.gz \
+	&& curl -O https://www.mirrorservice.org/sites/distfiles.macports.org/mpich/mpich-3.2.tar.gz \
 	&& tar xf mpich-*.tar.gz \
 	&& cd mpich-* \
 	&& ./configure \

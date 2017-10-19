@@ -10,6 +10,11 @@ pbs_mom:
     exec: /usr/sbin/pbs_mom -D
     restart_limit: -1
     requires: trqauthd, clusterwatcher
+    
+sharedfolders:
+    type: shell
+    exec: "/usr/bin/sshfs root@headnode:/cluster /cluster -o nonempty"
+    requires: clusterstart
 
 clustertargets:
     type: shell

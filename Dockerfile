@@ -106,3 +106,22 @@ ADD hello.job /home/batchuser/hello.job
 RUN chmod 700 /home/batchuser/.ssh
 RUN chmod 600 /home/batchuser/.ssh/*
 RUN chown -R batchuser:batchuser /home/batchuser/.ssh
+
+# set up sshfs
+RUN yum -y makecache fast
+RUN yum -y install epel-release
+RUN yum -y install sshfs
+
+# add the SSH key for root
+
+RUN mkdir -p /root/.ssh
+ADD root.id_rsa /root/.ssh/id_rsa
+ADD root.id_rsa.pub /root/.ssh/id_rsa.pub
+RUN cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys
+RUN cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys2
+RUN chmod 700 /root/.ssh
+RUN chmod 600 /root/.ssh/*
+
+# set up /cluster shared folder
+RUN mkdir /cluster
+ADD test.sh /root/test.sh

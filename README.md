@@ -8,6 +8,8 @@ The default SSH port is changed to 2222 to avoid conflicting with any other SSH 
 
 ## Building it
 
+If you want to build the image from scratch, just use the regular Docker process. It is not usually necessary unless you want to customise the build.
+
 This image is based from the `vcc-base-centos`, therefore, will be built with a CentOS based. It should not be too difficult to port to another distribution base, since the Dockerfile will build all components from source.
 
 ```
@@ -28,28 +30,32 @@ Information about the image can be obtained by running
 docker run --rm -it hpchud/vcc-torque --info
 ```
 
-You need to have a discovery service running
+You need to have a discovery service running on one of your nodes
 
 ```
-docker run -d -p 2379:2379 hpchud/vcc-discovery
+docker run -d -p 2379:2379 --restart=always hpchud/vcc-discovery
 ```
 
 Start a head node first
 
 ```
-docker run -d --net=host hpchud/vcc-torque \
+docker run -d --net=host --privileged -v /cluster:/cluster \
+    hpchud/vcc-torque \
     --cluster=test \
     --storage-host=STORAGE_HOST_IP \
     --storage-port=2379 \
     --service=headnode
 ```
 
+> The `/cluster` folder will be shared to the worker nodes, so it's a good idea to persist it on the head node via a Docker volume (the `-v` argument)
+
 An ID for this container will be printed to the screen.
 
 Then, on another host, start a worker node
 
 ```
-docker run -d --net=host hpchud/vcc-torque \
+docker run -d --net=host --privileged \
+    hpchud/vcc-torque \
     --cluster=test \
     --storage-host=STORAGE_HOST_IP \
     --storage-port=2379 \
@@ -60,6 +66,12 @@ And that's it! You can now enter the head node container using SSH.
 
 ```
 ssh -i batchuser.id_rsa batchuser@headnode.ip -p 2222
+```
+
+or just use the Docker to execute a shell
+
+```
+docker exec -it HEADNODE_CID /bin/bash
 ```
 
 Try running `pbsnodes` to see the cluster, and SSH from the head node to the worker node using it's name!

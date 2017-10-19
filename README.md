@@ -8,7 +8,7 @@ The default SSH port is changed to 2222 to avoid conflicting with any other SSH 
 
 ## Building it
 
-If you want to build the image from scratch, just use the regular Docker process. It is not usually necessary unless you want to customise the build.
+If you want to build the image from scratch, just use the regular Docker process. It is not usually necessary for testing unless you want to customise the build.
 
 This image is based from the `vcc-base-centos`, therefore, will be built with a CentOS based. It should not be too difficult to port to another distribution base, since the Dockerfile will build all components from source.
 
@@ -90,6 +90,8 @@ Warning: Permanently added '[vnode_a4aa99e7aeb6]:2222,[10.10.10.3]:2222' (ECDSA)
 ```
 
 To add more worker nodes, simply repeat the second `docker run`. To start up the cluster on a single machine, just omit the `--net=host` option (in this case you can use `docker exec` to log in to the headnode).
+
+To use this container for real, you should replace the keys.
 
 ## Configuration
 

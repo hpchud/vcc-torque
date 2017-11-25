@@ -47,7 +47,8 @@ RUN cd /tmp \
 	&& make install \
 	&& cd / \
 	&& rm -rf /tmp/maui-build
-COPY maui-config.sh /etc/vcc/maui-config.sh
+ADD maui-config.sh /etc/vcc/maui-config.sh
+ADD units/maui.service /etc/systemd/system/maui.service
 
 # build and install mpich
 RUN cd /tmp \
@@ -67,9 +68,9 @@ RUN ln -s /usr/local/maui/bin/showres /usr/bin/showres
 RUN ln -s /usr/local/maui/bin/checkjob /usr/bin/checkjob
 
 # install vcc configuration files
-COPY init.yml /etc/init.yml
-COPY services.yml /etc/services.yml
-COPY dependencies.yml /etc/vcc/dependencies.yml
+ADD cluster.yml /etc/cluster.yml
+ADD services.yml /etc/services.yml
+ADD dependencies.yml /etc/vcc/dependencies.yml
 
 # cluster hook scripts
 ADD hooks/pbsnodes.sh /etc/vcc/cluster-hooks.d/pbsnodes.sh
@@ -94,3 +95,32 @@ RUN yum -y install sshfs
 
 # set up /cluster shared folder
 RUN mkdir /cluster
+
+# add the units and configure for services
+RUN mkdir /etc/systemd/system/trqauthd.service.d
+RUN mkdir /etc/systemd/system/pbs_server.service.d
+RUN mkdir /etc/systemd/system/pbs_mom.service.d
+RUN mkdir /etc/systemd/system/maui.service.d
+
+ADD units/required-by-vcc.conf /etc/systemd/system/trqauthd.service.d/required-by-vcc.conf
+ADD units/required-by-vcc.conf /etc/systemd/system/pbs_server.service.d/required-by-vcc.conf
+ADD units/required-by-vcc.conf /etc/systemd/system/pbs_mom.service.d/required-by-vcc.conf
+ADD units/required-by-vcc.conf /etc/systemd/system/maui.service.d/required-by-vcc.conf
+
+ADD units/headnode-service.conf /etc/systemd/system/pbs_server.service.d/headnode-service.conf
+ADD units/headnode-service.conf /etc/systemd/system/maui.service.d/headnode-service.conf
+
+ADD units/workernode-service.conf /etc/systemd/system/pbs_mom.service.d/workernode-service.conf
+
+ADD units/cluster-sshfs.service /etc/systemd/system/cluster-sshfs.service
+
+RUN systemctl enable trqauthd.service \
+	pbs_server.service \
+	pbs_mom.service \
+	maui.service \
+	cluster-sshfs.service
+
+RUN ln -s /etc/systemd/system/trqauthd.service /etc/systemd/system/vcc-services.target.requires/trqauthd.service \
+	&& ln -s /etc/systemd/system/pbs_server.service /etc/systemd/system/vcc-services.target.requires/pbs_server.service \
+	&& ln -s /etc/systemd/system/pbs_mom.service /etc/systemd/system/vcc-services.target.requires/pbs_mom.service \
+	&& ln -s /etc/systemd/system/maui.service /etc/systemd/system/vcc-services.target.requires/maui.service

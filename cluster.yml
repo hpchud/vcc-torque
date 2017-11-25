@@ -1,0 +1,12 @@
+---
+systemd: true
+kvstore:
+    type: "etcd"
+    host: "localhost"
+    port: "4001"
+cluster: "test"
+service: workernode
+image_info:
+    name: vcc torque image
+    author: joshua.higgins@hud.ac.uk
+    version: 0.1

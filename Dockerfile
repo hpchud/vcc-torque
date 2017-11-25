@@ -114,7 +114,8 @@ ADD units/workernode-service.conf /etc/systemd/system/pbs_mom.service.d/workerno
 
 ADD units/cluster-sshfs.service /etc/systemd/system/cluster-sshfs.service
 
-ADD units/server_name.conf /etc/systemd/system/pbs_server.service.d/server_name.conf
+ADD units/server_name.conf /etc/systemd/system/trqauthd.service.d/server_name.conf
+ADD units/qterm-fix.conf /etc/systemd/system/pbs_server.service.d/qterm-fix.conf
 
 RUN systemctl enable trqauthd.service \
 	pbs_server.service \

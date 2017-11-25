@@ -4,9 +4,9 @@
 
 echo -n > /var/spool/torque/server_priv/nodes
 
-INIT_RUN_DIR="${INIT_RUN_DIR:-/run}"
+VCC_RUN_DIR="${VCC_RUN_DIR:-/run}"
 
-cat $INIT_RUN_DIR/hosts.vcc | while read line; do
+cat $VCC_RUN_DIR/hosts.vcc | while read line; do
 	host="`echo $line | awk '{print $2}'`"
 	if [ "$host" != "`hostname`" ]; then
 		# torque can not handle a hostname that starts with a number,
@@ -16,15 +16,15 @@ cat $INIT_RUN_DIR/hosts.vcc | while read line; do
 done
 
 # kill the torque server without stopping jobs
-qterm -t quick
+systemctl restart pbs_server
 
 # have to kill maui too, but give time for pbs_server to restart
 sleep 5
-kill `cat /var/run/maui.pid`
+systemctl restart maui
 
 # using auto_node_np confuses maui, so save auto detected nps
 # wait another few seconds incase auto detection is taking awhile
-sleep 3
+sleep 5
 cat /var/spool/torque/server_priv/nodes | while read line; do
 	node="`echo $line | awk '{print $1}'`"
 	np="`pbsnodes $node | grep np | awk '{print $3}'`"

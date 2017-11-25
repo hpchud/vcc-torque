@@ -10,3 +10,4 @@ ExecStart=/usr/bin/sshfs root@headnode:/cluster /cluster -o nonempty
 
 [Install]
 RequiredBy=vcc-services.target
+WantedBy=multi-user.target

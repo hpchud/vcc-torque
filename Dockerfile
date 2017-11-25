@@ -1,4 +1,4 @@
-FROM hpchud/vcc-base-centos:7
+FROM hpchud/vcc-base-centos:systemd
 
 # install packages required
 RUN yum -y install make libtool openssl-devel libxml2-devel boost-devel gcc gcc-c++ git nano openssh-server openssh-clients gcc-gfortran
@@ -11,6 +11,9 @@ RUN git clone https://github.com/adaptivecomputing/torque.git -b 5.1.1.2 torque-
 	&& ./configure --prefix=/usr --disable-posixmemlock --disable-cpuset \
 	&& make \
 	&& make install \
+	&& cp contrib/systemd/trqauthd.service /etc/systemd/system/ \
+	&& cp contrib/systemd/pbs_server.service /etc/systemd/system/ \
+	&& cp contrib/systemd/pbs_mom.service /etc/systemd/system/ \
 	&& ldconfig \
 	&& cd .. \
 	&& cp torque-src/torque.setup . \
@@ -66,8 +69,6 @@ RUN ln -s /usr/local/maui/bin/checkjob /usr/bin/checkjob
 # install vcc configuration files
 COPY init.yml /etc/init.yml
 COPY services.yml /etc/services.yml
-COPY services-headnode.yml /etc/vcc/services-headnode.yml
-COPY services-workernode.yml /etc/vcc/services-workernode.yml
 COPY dependencies.yml /etc/vcc/dependencies.yml
 
 # cluster hook scripts
@@ -84,44 +85,12 @@ ADD sshd_config /etc/ssh/sshd_config
 RUN echo -e "\tPort 2222" >> /etc/ssh/ssh_config
 RUN echo -e "\tStrictHostKeyChecking no" >> /etc/ssh/ssh_config
 RUN echo -e "\tUserKnownHostsFile /dev/null" >> /etc/ssh/ssh_config
+RUN systemctl enable sshd
 
-# add the batchuser user
-RUN useradd --create-home --uid 900 --shell /bin/bash batchuser
-RUN echo batchuser:batchuser | chpasswd
-
-# add the SSH key for batchuser
-
-RUN mkdir -p /home/batchuser/.ssh
-ADD batchuser.id_rsa /home/batchuser/.ssh/id_rsa
-ADD batchuser.id_rsa.pub /home/batchuser/.ssh/id_rsa.pub
-RUN cat /home/batchuser/.ssh/id_rsa.pub > /home/batchuser/.ssh/authorized_keys
-RUN cat /home/batchuser/.ssh/id_rsa.pub > /home/batchuser/.ssh/authorized_keys2
-
-# add example MPI job
-
-ADD hello.job /home/batchuser/hello.job
-
-# fix permissions for batchuser
-
-RUN chmod 700 /home/batchuser/.ssh
-RUN chmod 600 /home/batchuser/.ssh/*
-RUN chown -R batchuser:batchuser /home/batchuser/.ssh
-
-# set up sshfs
+# install sshfs
 RUN yum -y makecache fast
 RUN yum -y install epel-release
 RUN yum -y install sshfs
 
-# add the SSH key for root
-
-RUN mkdir -p /root/.ssh
-ADD root.id_rsa /root/.ssh/id_rsa
-ADD root.id_rsa.pub /root/.ssh/id_rsa.pub
-RUN cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys
-RUN cat /root/.ssh/id_rsa.pub > /root/.ssh/authorized_keys2
-RUN chmod 700 /root/.ssh
-RUN chmod 600 /root/.ssh/*
-
 # set up /cluster shared folder
 RUN mkdir /cluster
-ADD test.sh /root/test.sh

@@ -1,0 +1,12 @@
+[Unit]
+Description=MAUI scheduler
+Requires=pbs_server.service
+After=pbs_server.service
+
+[Service]
+ExecStartPre=-/etc/vcc/maui-config.sh
+ExecStart=/usr/local/maui/sbin/maui -d
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=Shared /cluster folder using sshfs
+Requires=vcc-dns.service
+Before=vcc-register.service
+ConditionPathExists=/run/vccservice-workernode
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sshfs root@headnode:/cluster /cluster -o nonempty
+
+[Install]
+RequiredBy=vcc-services.target

@@ -11,7 +11,7 @@ Restart=always
 RestartSec=5
 StartLimitIntervalSec=10
 StartLimitBurst=3
-ExecStart=/usr/bin/sshfs root@headnode:/home /home -o nonempty
+ExecStart=/usr/bin/sshfs root@headnode:/home /home -o nonempty,allow_other
 ExecStop=/usr/bin/umount /home
 
 [Install]

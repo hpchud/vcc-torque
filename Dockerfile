@@ -132,6 +132,5 @@ RUN echo batchuser:batchuser | chpasswd
 ADD units/batchuser-keys.service /etc/systemd/system/batchuser-keys.service
 RUN systemctl enable batchuser-keys.service
 
-# set up /cluster shared folder
-RUN mkdir /cluster
-ADD hello.job /cluster/hello.job
+# add example job to bachuser home
+ADD hello.job /home/batchuser/hello.job

@@ -2,6 +2,7 @@
 Description=VCC public keys for the batchuser account
 PartOf=vcc.service
 After=vcc-dns.service
+ConditionPathExists=/run/vccservice-headnode
 
 [Service]
 Type=notify

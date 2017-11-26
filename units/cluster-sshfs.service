@@ -1,6 +1,7 @@
 [Unit]
 Description=Shared /cluster folder using sshfs
 Requires=vcc-keys.service
+After=vcc-wait4deps.service
 Before=vcc-register.service
 ConditionPathExists=/run/vccservice-workernode
 

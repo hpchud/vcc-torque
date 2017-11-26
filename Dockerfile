@@ -69,7 +69,6 @@ RUN ln -s /usr/local/maui/bin/checkjob /usr/bin/checkjob
 
 # install vcc configuration files
 ADD cluster.yml /etc/cluster.yml
-ADD services.yml /etc/services.yml
 ADD dependencies.yml /etc/vcc/dependencies.yml
 
 # cluster hook scripts
@@ -95,6 +94,7 @@ RUN yum -y install sshfs
 
 # set up /cluster shared folder
 RUN mkdir /cluster
+ADD hello.job /cluster/hello.job
 
 # add the units and configure for services
 RUN mkdir /etc/systemd/system/trqauthd.service.d

@@ -7,6 +7,10 @@ ConditionPathExists=/run/vccservice-workernode
 
 [Service]
 Type=forking
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=10
+StartLimitBurst=3
 ExecStart=/usr/bin/sshfs root@headnode:/cluster /cluster -o nonempty
 ExecStop=/usr/bin/umount /cluster
 

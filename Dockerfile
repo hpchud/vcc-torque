@@ -92,10 +92,6 @@ RUN yum -y makecache fast
 RUN yum -y install epel-release
 RUN yum -y install sshfs
 
-# set up /cluster shared folder
-RUN mkdir /cluster
-ADD hello.job /cluster/hello.job
-
 # add the units and configure for services
 RUN mkdir /etc/systemd/system/trqauthd.service.d
 RUN mkdir /etc/systemd/system/pbs_server.service.d
@@ -127,3 +123,11 @@ RUN ln -s /etc/systemd/system/trqauthd.service /etc/systemd/system/vcc-services.
 	&& ln -s /etc/systemd/system/pbs_server.service /etc/systemd/system/vcc-services.target.requires/pbs_server.service \
 	&& ln -s /etc/systemd/system/pbs_mom.service /etc/systemd/system/vcc-services.target.requires/pbs_mom.service \
 	&& ln -s /etc/systemd/system/maui.service /etc/systemd/system/vcc-services.target.requires/maui.service
+
+# add the batchuser user
+RUN useradd --create-home --uid 900 --shell /bin/bash batchuser
+RUN echo batchuser:batchuser | chpasswd
+
+# set up /cluster shared folder
+RUN mkdir /cluster
+ADD hello.job /cluster/hello.job

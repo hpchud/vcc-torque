@@ -1,0 +1,15 @@
+[Unit]
+Description=VCC public keys for the batchuser account
+PartOf=vcc.service
+After=vcc-dns.service
+
+[Service]
+Type=notify
+NotifyAccess=all
+User=batchuser
+ExecStart=/usr/local/bin/node /vccjs/clusterkeys.js
+Restart=on-failure
+
+[Install]
+RequiredBy=vcc.service
+

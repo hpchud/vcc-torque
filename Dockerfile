@@ -128,6 +128,10 @@ RUN ln -s /etc/systemd/system/trqauthd.service /etc/systemd/system/vcc-services.
 RUN useradd --create-home --uid 900 --shell /bin/bash batchuser
 RUN echo batchuser:batchuser | chpasswd
 
+# configure automatic key generation for the batchuser
+ADD units/batchuser-keys.service /etc/systemd/system/batchuser-keys.service
+RUN systemctl enable batchuser-keys.service
+
 # set up /cluster shared folder
 RUN mkdir /cluster
 ADD hello.job /cluster/hello.job
